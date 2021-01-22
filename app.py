@@ -1,67 +1,22 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for
-from subprocess import call as command
-command(['clear'])
+from dao.database_handler import GameDao, UserDao
+from dao.connect import do_connect
+from models.game import Game
+from models.user import User
+
 
 flask_app = Flask(__name__)
 flask_app.secret_key = "admin"
 
+db = do_connect(flask_app)
 
-class Game:
-    def __init__(self, title, category, console):
-        self.__title = title
-        self.__category = category
-        self.__console = console
-
-    @property
-    def title(self):
-        return self.__title
-
-    @property
-    def category(self):
-        return self.__category
-
-    @property
-    def console(self):
-        return self.__console
-
-
-class User(object):
-
-    def __init__(self, id, name, passwd):
-        self.__id = id
-        self.__name = name
-        self.__passwd = passwd
-
-    @property
-    def name(self):
-        return self.__name
-
-    @property
-    def id(self):
-        return self.__id
-
-    def do_login(self, name, passwd):
-        return self.__name == name and self.__passwd == passwd
-
-
-user1 = User(1, 'Raven', '123456')
-user2 = User(2, 'Matheus', 'Python')
-user3 = User(3, 'Jamela1', 'Javascripto')
-users = {
-    user1.name: user1,
-    user2.name: user2,
-    user3.name: user3
-}
-
-game01 = Game('Rocket League', 'E-Sports', 'PC, PlayStation and X-Box')
-game02 = Game('CS:GO', 'FPS', 'PC')
-game03 = Game('PUBG', 'Battle-Royale', 'PC')
-games_list = [game01, game02, game03]
+gamedao = GameDao(db)
+userdao = UserDao(db)
 
 
 @flask_app.route('/')
 def game_list():
-    return render_template('list.html', title="Games", games=games_list)
+    return render_template('list.html', title="Games", games=gamedao.list_games())
 
 
 @flask_app.route('/new-game')
@@ -79,8 +34,37 @@ def createGame():
     category = request.form['category']
     console = request.form['console']
 
-    games_list.append(Game(name, category, console))
+    gamedao.save(Game(name, category, console))
 
+    return redirect(url_for('game_list'))
+
+
+@flask_app.route('/editGame/<int:id>')
+def editGame(id):
+    if verify_logged_user():
+        game = gamedao.search_by_id(id)
+        return render_template('edit-game.html', title="Edit Game", game=game)
+    else:
+        flash('You need to login before accessing this page')
+        return redirect(url_for('login', next='editGame'))
+
+
+@flask_app.route('/updateGame', methods=['POST'])
+def updateGame():
+    id = request.form['id']
+    name = request.form['name']
+    category = request.form['category']
+    console = request.form['console']
+
+    gamedao.save(Game(name, category, console, id))
+
+    return redirect(url_for('game_list'))
+
+
+@flask_app.route('/deleteGame/<int:id>')
+def deleteGame(id):
+    gamedao.delete(id)
+    flash('Game was successfully deleted!')
     return redirect(url_for('game_list'))
 
 
@@ -93,8 +77,9 @@ def login():
 def auth():
     username = request.form['username']
     passwd = request.form['password']
+    users = userdao.search_by_name(username)
 
-    if username in users and users[username].do_login(username, passwd):
+    if users.do_login(username, passwd):
         session['logged_user'] = username
         session['logged'] = True
         flash('Successfully logged')
