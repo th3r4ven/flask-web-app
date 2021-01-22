@@ -1,0 +1,24 @@
+
+{% extends "template.html" %}
+
+{% block content %}
+
+<form action="{{ url_for('createGame')}}" method="post">
+<fieldset>
+  <div class="form-group">
+    <label for="name">name</label>
+    <input type="text" id="name" name="name" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="Category">Category</label>
+    <input type="text" id="Category" name="category" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="console">Console</label>
+    <input type="text" id="console" name="console" class="form-control">
+  </div>
+  <button type="submit" class="btn btn-primary btn-submit">Submit</button>
+</fieldset>
+</form>
+
+{%endblock%}

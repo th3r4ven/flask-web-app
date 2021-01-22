@@ -1,0 +1,22 @@
+
+{% extends "template.html" %}
+
+{% block content %}
+
+<form action="{{ url_for('auth') }}" method="post">
+<fieldset>
+  <div class="form-group">
+      <h1>Login</h1>
+    <label for="username">username</label>
+    <input type="text" id="username" name="username" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" class="form-control">
+    <input type="hidden" name="next" value="{{ next or 'game_list' }}">
+  </div>
+  <button type="submit" class="btn btn-primary btn-submit">Submit</button>
+</fieldset>
+</form>
+
+{%endblock%}

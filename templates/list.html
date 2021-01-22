@@ -1,0 +1,24 @@
+{% extends "template.html" %}
+
+{% block content %}
+
+<table>
+    <thead>
+    <tr>
+        <td>Title</td>
+        <td>Category</td>
+        <td>Console</td>
+    </tr>
+    </thead>
+    <tbody>
+        {% for game in games %}
+            <tr>
+                <td>{{ game.title }}</td>
+                <td>{{ game.category }}</td>
+                <td>{{ game.console }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{%endblock%}
