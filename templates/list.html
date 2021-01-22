@@ -2,12 +2,13 @@
 
 {% block content %}
 
-<table>
+<table class="table">
     <thead>
     <tr>
-        <td>Title</td>
-        <td>Category</td>
-        <td>Console</td>
+        <th scope="col">Title</th>
+        <th scope="col">Category</th>
+        <th scope="col">Console</th>
+        <th scope="col">Action</th>
     </tr>
     </thead>
     <tbody>
@@ -16,6 +17,7 @@
                 <td>{{ game.title }}</td>
                 <td>{{ game.category }}</td>
                 <td>{{ game.console }}</td>
+                <td><a class="btn btn-primary" href="{{ url_for('editGame', id=game.id)  }}">Edit</a>&nbsp;<a class="btn btn-primary" href="{{ url_for('deleteGame', id=game.id)  }}">Delete</a></td>
             </tr>
         {% endfor %}
     </tbody>
